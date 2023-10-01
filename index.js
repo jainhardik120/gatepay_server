@@ -14,8 +14,10 @@ app.get("/", async (req, res, next)=>{
 })
 
 const authRouter = require("./routes/auth.routes.js")
+const paymentRouter = require("./routes/payments.routes.js")
 
 app.use('/api/auth', authRouter);
+app.use('/api/payments', paymentRouter);
 
 app.use((err, req, res, next)=>{
   console.log(err);

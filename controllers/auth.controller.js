@@ -22,7 +22,6 @@ const authController = {
             if (!Email || !Password) {
                 const error = new Error('Email and Password are required.');
                 error.status = 400;
-                error.status = 400;
                 throw error;
             }
             const user = await pool.query('SELECT * FROM Users WHERE Email = $1', [Email]);
@@ -37,7 +36,7 @@ const authController = {
                 error.status = 401;
                 throw error;
             }
-            const token = jwt.sign({ userId: user.rows[0].ID }, secretKey);
+            const token = jwt.sign({ userId: user.rows[0].id }, secretKey);
             res.status(200).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
         } catch (error) {
             next(error);
@@ -62,7 +61,7 @@ const authController = {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(Password, saltRounds);
             const newUser = await pool.query('INSERT INTO Users (ID, Name, Email, Password) VALUES ($1, $2, $3, $4) RETURNING *', [userId, Name, Email, hashedPassword]);
-            const token = jwt.sign({ userId: newUser.rows[0].ID }, secretKey);
+            const token = jwt.sign({ userId: newUser.rows[0].id }, secretKey);
             res.status(201).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
         } catch (error) {
             next(error);
@@ -82,7 +81,7 @@ const authController = {
             const user = await pool.query('SELECT * FROM Users WHERE Email = $1', [email]);
 
             if (user.rows.length > 0) {
-                const token = jwt.sign({ userId: user.rows[0].ID }, secretKey);
+                const token = jwt.sign({ userId: user.rows[0].id }, secretKey);
                 return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
             } else {
                 const generatedPassword = generateRandomPassword(32);
@@ -90,7 +89,7 @@ const authController = {
                 const hashedPassword = bcrypt.hashSync(generatedPassword, saltRounds);
                 const userId = uuid.v4();
                 const newUser = await pool.query('INSERT INTO Users (ID, Name, Email, Password) VALUES ($1, $2, $3, $4) RETURNING *', [userId, `${payload.given_name} ${payload.family_name}`, email, hashedPassword]);
-                const token = jwt.sign({ userId: newUser.rows[0].ID }, secretKey);
+                const token = jwt.sign({ userId: newUser.rows[0].id }, secretKey);
                 return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
             }
         } catch (error) {
