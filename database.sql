@@ -42,3 +42,6 @@ CREATE TABLE UserTransactions (
     TransactionType VARCHAR(255),
     Status VARCHAR(50)
 );
+
+ALTER TABLE Users
+ADD COLUMN NewUserLandingCompleted BOOLEAN DEFAULT FALSE;

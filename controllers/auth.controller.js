@@ -38,7 +38,7 @@ const authController = {
                 throw error;
             }
             const token = jwt.sign({ userId: user.rows[0].ID }, secretKey);
-            res.status(200).json({ token, isNewUser: false, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
+            res.status(200).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
         } catch (error) {
             next(error);
         }
@@ -63,7 +63,7 @@ const authController = {
             const hashedPassword = await bcrypt.hash(Password, saltRounds);
             const newUser = await pool.query('INSERT INTO Users (ID, Name, Email, Password) VALUES ($1, $2, $3, $4) RETURNING *', [userId, Name, Email, hashedPassword]);
             const token = jwt.sign({ userId: newUser.rows[0].ID }, secretKey);
-            res.status(201).json({ token, isNewUser: true, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
+            res.status(201).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
         } catch (error) {
             next(error);
         }
@@ -83,7 +83,7 @@ const authController = {
 
             if (user.rows.length > 0) {
                 const token = jwt.sign({ userId: user.rows[0].ID }, secretKey);
-                return res.json({ token, isNewUser: false, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
+                return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
             } else {
                 const generatedPassword = generateRandomPassword(32);
                 const saltRounds = 10;
@@ -91,7 +91,7 @@ const authController = {
                 const userId = uuid.v4();
                 const newUser = await pool.query('INSERT INTO Users (ID, Name, Email, Password) VALUES ($1, $2, $3, $4) RETURNING *', [userId, `${payload.given_name} ${payload.family_name}`, email, hashedPassword]);
                 const token = jwt.sign({ userId: newUser.rows[0].ID }, secretKey);
-                return res.json({ token, isNewUser: true, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
+                return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
             }
         } catch (error) {
             next(error);
