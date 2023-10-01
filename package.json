@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "gatepay_server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "start" : "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Hardik Jain",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
