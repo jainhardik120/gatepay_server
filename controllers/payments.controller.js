@@ -54,8 +54,7 @@ const paymentsController = {
             await pool.query(insertTransactionQuery, insertTransactionValues);
 
             res.status(200).json({
-                success: true,
-                order,
+                orderId : order.id,
                 transactionId
             });
         } catch (error) {
