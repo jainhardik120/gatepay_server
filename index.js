@@ -13,7 +13,12 @@ app.get("/", async (req, res, next)=>{
   return res.json({msg: "API Running"})
 })
 
+const authRouter = require("./routes/auth.routes.js")
+
+app.use('/api/auth', authRouter);
+
 app.use((err, req, res, next)=>{
+  console.log(err);
   return res.status(err.status || 500).json({
       msg: err.message || "Internal Server Error"
   });
