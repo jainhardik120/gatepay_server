@@ -197,7 +197,7 @@ const paymentsController = {
 
     const { rows } = await pool.query(query, [userId]);
 
-    res.status(200).json({ transactions: rows });
+    res.status(200).json(rows);
         } catch (error) {
             next(error);
         }
