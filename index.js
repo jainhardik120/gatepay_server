@@ -15,9 +15,13 @@ app.get("/", async (req, res, next)=>{
 
 const authRouter = require("./routes/auth.routes.js")
 const paymentRouter = require("./routes/payments.routes.js")
+const parkingRouter = require("./routes/parking.routes.js")
+const employeeAuthRouter = require("./routes/employee.auth.routes.js")
 
 app.use('/api/auth', authRouter);
 app.use('/api/payments', paymentRouter);
+app.use('/api/parking', parkingRouter);
+app.use('/api/employee/auth', employeeAuthRouter);
 
 app.use((err, req, res, next)=>{
   console.log(err);

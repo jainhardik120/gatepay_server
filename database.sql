@@ -44,3 +44,32 @@ CREATE TABLE UserTransactions (
     Status VARCHAR(50),
     TOLPARID UUID REFERENCES TollsAndParkingSpaces(ID)
 );
+
+CREATE TABLE ParkingSpace (
+    SpaceID UUID PRIMARY KEY,
+    ParkingLotID UUID REFERENCES TollsAndParkingSpaces(ID),
+    IsOccupied BOOLEAN DEFAULT FALSE,
+    VehicleID UUID REFERENCES Vehicle(ID),
+    Floor CHAR(1),
+    ChargesPerHour DECIMAL(10, 2),
+    FixedCharges DECIMAL(10, 2),
+    BaseTime DECIMAL(10, 2)
+);
+
+CREATE TABLE EmployeeAuthentication (
+    EmployeeID UUID PRIMARY KEY,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    ParkingTollID UUID REFERENCES TollsAndParkingSpaces(ID)
+);
+
+CREATE TABLE VehicleEntryExit (
+    EntryExitID UUID PRIMARY KEY,
+    VehicleID UUID REFERENCES Vehicle(ID),
+    EntryTime TIMESTAMP,
+    ParkingLotID UUID REFERENCES TollsAndParkingSpaces(ID),
+    ParkingSpaceID UUID REFERENCES ParkingSpace(SpaceID),
+    ExitTime TIMESTAMP,
+    Charges DECIMAL(10, 2),
+    TransactionID UUID REFERENCES UserTransactions(TransactionID)
+);
