@@ -70,7 +70,7 @@ const paymentsController = {
             const body = razorpay_order_id + "|" + razorpay_payment_id;
 
             const expectedSignature = crypto
-                .createHmac("sha256", process.env.RAZORPAY_APT_SECRET)
+                .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
                 .update(body.toString())
                 .digest("hex");
 
@@ -101,14 +101,14 @@ const paymentsController = {
                 error.status = 400;
                 throw error;
             }
-            const amountToAdd = searchTransactionResult.rows[0].amount;
+            const amountToAdd = searchTrasanctionResult.rows[0].amount;
             const updateBalanceQuery = `
     UPDATE Users
     SET Balance = Balance + $1
     WHERE ID = $2
     RETURNING Balance;
 `;
-            const updateBalanceValues = [amountToAdd, userId];
+            const updateBalanceValues = [amountToAdd, userIdFromDb];
 
             const result = await pool.query(updateBalanceQuery, updateBalanceValues);
             const updatedBalance = result.rows[0].balance;
