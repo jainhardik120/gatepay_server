@@ -55,7 +55,8 @@ const paymentsController = {
 
             res.status(200).json({
                 orderId : order.id,
-                transactionId
+                transactionId,
+                amount : req.body.amount
             });
         } catch (error) {
             next(error);
