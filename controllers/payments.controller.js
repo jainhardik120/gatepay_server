@@ -54,9 +54,9 @@ const paymentsController = {
             await pool.query(insertTransactionQuery, insertTransactionValues);
 
             res.status(200).json({
-                orderId : order.id,
+                orderId: order.id,
                 transactionId,
-                amount : req.body.amount
+                amount: req.body.amount
             });
         } catch (error) {
             next(error);
@@ -123,6 +123,83 @@ const paymentsController = {
             res.status(200).json({ balance: updatedBalance });
         } catch (error) {
             next(error)
+        }
+    },
+    chargeUser: async (req, res, next) => {
+        try {
+            const { userId, tolParId, amount } = req.body;
+            const user = await pool.query('SELECT Balance FROM Users WHERE ID = $1', [userId]);
+
+            if (user.rows.length === 0) {
+                throw new Error('User not found.');
+            }
+
+            const userBalance = parseFloat(user.rows[0].balance);
+
+            if (userBalance < amount) {
+                throw new Error('Insufficient balance.');
+            }
+            const updateUserBalanceQuery = 'UPDATE Users SET Balance = Balance - $1 WHERE ID = $2';
+            await pool.query(updateUserBalanceQuery, [amount, userId]);
+            const updateParkingLotBalanceQuery = 'UPDATE TollsAndParkingSpaces SET Balance = Balance + $1 WHERE ID = $2';
+            await pool.query(updateParkingLotBalanceQuery, [amount, tolParId]);
+            const transactionId = uuid.v4();
+            const currentDate = new Date();
+            const transactionType = 'Payment';
+            const status = 'Complete';
+            const createTransactionQuery = `
+      INSERT INTO UserTransactions (TransactionID, Date, UserID, Amount, StartBalance, EndBalance, TransactionType, Status, TOLPARID)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `;
+
+            const createTransactionValues = [
+                transactionId,
+                currentDate,
+                userId,
+                amount,
+                userBalance,
+                userBalance - amount,
+                transactionType,
+                status,
+                tolParId
+            ];
+
+            await pool.query(createTransactionQuery, createTransactionValues);
+
+            res.json( { success: true, message: 'Payment successful.' });
+        } catch (error) {
+            next(error);
+        }
+    },
+    userTransactions : async (req, res, next)=>{
+        try {
+            const userId = req.userId;
+
+    const query = `
+      SELECT
+        ut.TransactionID,
+        ut.Date,
+        ut.TransactionType,
+        ut.Status,
+        ut.EndBalance,
+        CASE
+          WHEN ut.TransactionType = 'Recharge' THEN ut.Amount
+          WHEN ut.TransactionType = 'Payment' THEN -ut.Amount
+          ELSE ut.Amount
+        END AS Amount,
+        tps.Name AS TollOrParkingName,
+        tps.LocationIdentifier AS Location
+      FROM UserTransactions ut
+      LEFT JOIN TollsAndParkingSpaces tps ON ut.TOLPARID = tps.ID
+      WHERE ut.UserID = $1
+      ORDER BY ut.Date DESC;
+    `;
+
+    const { rows } = await pool.query(query, [userId]);
+
+    res.status(200).json({ transactions: rows });
+        } catch (error) {
+            next(error);
         }
     }
 }

@@ -3,11 +3,12 @@ CREATE TABLE Users (
     Name VARCHAR(255) NOT NULL,
     DateOfBirth DATE,
     Address VARCHAR(255),
-    Balance DECIMAL(10, 2),
+    Balance DECIMAL(10, 2) DEFAULT 0.0,
     Email VARCHAR(255) UNIQUE NOT NULL,
     PhoneNumber VARCHAR(15),
     AlternateEmergencyContact VARCHAR(255),
-    Password VARCHAR(255) NOT NULL
+    Password VARCHAR(255) NOT NULL,
+    NewUserLandingCompleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE Vehicle (
@@ -40,14 +41,6 @@ CREATE TABLE UserTransactions (
     StartBalance DECIMAL(10, 2),
     EndBalance DECIMAL(10, 2),
     TransactionType VARCHAR(255),
-    Status VARCHAR(50)
+    Status VARCHAR(50),
+    TOLPARID UUID REFERENCES TollsAndParkingSpaces(ID)
 );
-
-ALTER TABLE Users
-ADD COLUMN NewUserLandingCompleted BOOLEAN DEFAULT FALSE;
-ALTER TABLE Users
-ALTER COLUMN Balance SET DEFAULT 0.0;
-ALTER TABLE UserTransactions
-ALTER COLUMN OrderID TYPE VARCHAR(255),
-ALTER COLUMN PaymentID TYPE VARCHAR(255);
-
