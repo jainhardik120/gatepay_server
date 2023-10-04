@@ -201,6 +201,13 @@ const paymentsController = {
         } catch (error) {
             next(error);
         }
+    },
+    spaceTransactions : async(req, res, next)=>{
+        try {
+            
+        } catch (error) {
+            
+        }
     }
 }
 
