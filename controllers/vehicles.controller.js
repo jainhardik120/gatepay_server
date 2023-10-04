@@ -17,7 +17,7 @@ const vehicleController = {
             `;
             const values = [userId,type, vehicleno, manufacturer, model, color, vehicleId];
             const result = await pool.query(insertQuery, values);
-            res.status(201).json({ vehicle: result.rows[0], message: 'Vehicle added successfully.' });
+            res.status(201).json(result.rows[0]);
         } catch (error) {
             next(error);
         }
@@ -43,7 +43,7 @@ const vehicleController = {
     `;
             const updateValues = [type, vehicleno, manufacturer, model, color, vehicleId];
             const result = await pool.query(updateQuery, updateValues);
-            res.status(200).json({ vehicle: result.rows[0], message: 'Vehicle details updated successfully.' });
+            res.status(200).json(result.rows[0]);
         } catch (error) {
             next(error);
         }
@@ -64,7 +64,7 @@ const vehicleController = {
             const deleteQuery = 'DELETE FROM Vehicle WHERE ID = $1';
             const deleteValues = [vehicleId];
             await pool.query(deleteQuery, deleteValues);
-            res.status(200).json({ message: 'Vehicle deleted successfully.' });
+            res.status(200).json({ msg: 'Vehicle deleted successfully.' });
         } catch (error) { next(error); }
     },
     listUserVehicles: async (req, res, next) => {
