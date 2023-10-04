@@ -1,6 +1,5 @@
 const crypto = require("crypto")
 const pool = require('../database');
-const instance = require("../razorpay")
 const uuid = require("uuid");
 const pgFormat = require("pg-format");
 

@@ -166,16 +166,16 @@ const paymentsController = {
 
             await pool.query(createTransactionQuery, createTransactionValues);
 
-            res.json( { success: true, message: 'Payment successful.' });
+            res.json({ success: true, message: 'Payment successful.' });
         } catch (error) {
             next(error);
         }
     },
-    userTransactions : async (req, res, next)=>{
+    userTransactions: async (req, res, next) => {
         try {
             const userId = req.userId;
 
-    const query = `
+            const query = `
       SELECT
         ut.TransactionID,
         ut.Date,
@@ -195,18 +195,18 @@ const paymentsController = {
       ORDER BY ut.Date DESC;
     `;
 
-    const { rows } = await pool.query(query, [userId]);
+            const { rows } = await pool.query(query, [userId]);
 
-    res.status(200).json(rows);
+            res.status(200).json(rows);
         } catch (error) {
             next(error);
         }
     },
-    spaceTransactions : async(req, res, next)=>{
+    spaceTransactions: async (req, res, next) => {
         try {
-            
+
         } catch (error) {
-            
+
         }
     }
 }
