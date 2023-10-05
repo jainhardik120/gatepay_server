@@ -124,6 +124,23 @@ const authController = {
         } catch (error) {
             next(error);
         }
+    },
+    updateFirebaseToken: async(req, res, next) => {
+        try {
+            const { firebaseToken } = req.body;
+            const loginId = req.loginId;
+    
+            const updateTokenQuery = `
+                UPDATE UserLogins
+                SET Token = $1
+                WHERE LoginID = $2
+            `;
+            await pool.query(updateTokenQuery, [firebaseToken, loginId]);
+    
+            res.status(200).json({ message: 'Firebase token updated successfully' });
+        } catch (error) {
+            next(error);
+        }
     }
 };
 

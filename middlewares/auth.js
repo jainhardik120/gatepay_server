@@ -20,6 +20,9 @@ const isAuthorized = async (req, res, next) => {
         throw error;
     }
     req.userId = decodedToken.userId;
+    if(decodedToken.loginId !== undefined){
+        req.loginId = decodedToken.loginId;
+    }
     next();
 }
 
