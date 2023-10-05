@@ -73,3 +73,10 @@ CREATE TABLE VehicleEntryExit (
     Charges DECIMAL(10, 2),
     TransactionID UUID REFERENCES UserTransactions(TransactionID)
 );
+
+CREATE TABLE UserLogins (
+    LoginID UUID PRIMARY KEY,
+    UserID UUID REFERENCES Users(ID),
+    Token VARCHAR(255),
+    LoginTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
