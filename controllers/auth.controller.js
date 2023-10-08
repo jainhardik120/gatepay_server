@@ -137,7 +137,7 @@ const authController = {
             `;
             await pool.query(updateTokenQuery, [firebaseToken, loginId]);
     
-            res.status(200).json({ message: 'Firebase token updated successfully' });
+            res.status(200).json({ msg: 'Firebase token updated successfully' });
         } catch (error) {
             next(error);
         }
