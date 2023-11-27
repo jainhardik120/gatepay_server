@@ -80,3 +80,30 @@ CREATE TABLE UserLogins (
     Token VARCHAR(255),
     LoginTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE EntryExitPoints (
+    PointID UUID PRIMARY KEY,
+    ParkingTollID UUID REFERENCES TollsAndParkingSpaces(ID),
+    LocationCoordinates VARCHAR(255),
+    IsActive BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE TollGateAdjacency (
+    EdgeID UUID PRIMARY KEY,
+    GateID1 UUID,
+    GateID2 UUID,
+    TollGateID UUID REFERENCES TollsAndParkingSpaces(ID),
+    Charges DECIMAL(10, 2),
+    FOREIGN KEY (GateID1) REFERENCES EntryExitPoints(PointID),
+    FOREIGN KEY (GateID2) REFERENCES EntryExitPoints(PointID)
+);
+
+CREATE TABLE TollGateEntries (
+    EntryID UUID PRIMARY KEY,
+    VehicleID UUID REFERENCES Vehicle(ID),
+    EntryGateID UUID REFERENCES EntryExitPoints(PointID),
+    ExitGateID UUID REFERENCES EntryExitPoints(PointID),
+    EntryTime TIMESTAMP,
+    ExitTime TIMESTAMP,
+    TransactionID UUID REFERENCES UserTransactions(TransactionID)
+);

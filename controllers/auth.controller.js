@@ -45,7 +45,7 @@ const authController = {
             await pool.query(insertLoginQuery, [loginID, user.rows[0].id]);
     
             const token = jwt.sign({ userId: user.rows[0].id , loginId : loginID}, secretKey);
-            res.status(200).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
+            res.status(200).json({ token, isNewUser: !user.rows[0].newuserlandingcompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
         } catch (error) {
             next(error);
         }
@@ -77,7 +77,7 @@ const authController = {
             `;
             await pool.query(insertLoginQuery, [loginID, newUser.rows[0].id]);
             const token = jwt.sign({ userId: newUser.rows[0].id , loginId : loginID }, secretKey);
-            res.status(201).json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
+            res.status(201).json({ token, isNewUser: !user.rows[0].newuserlandingcompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
         } catch (error) {
             next(error);
         }
@@ -104,7 +104,7 @@ const authController = {
             `;
             await pool.query(insertLoginQuery, [loginID, user.rows[0].id]);
                 const token = jwt.sign({ userId: user.rows[0].id  , loginId : loginID}, secretKey);
-                return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
+                return res.json({ token, isNewUser: !user.rows[0].newuserlandingcompleted, userID: user.rows[0].id, Name: user.rows[0].name, Email: user.rows[0].email });
             } else {
                 const generatedPassword = generateRandomPassword(32);
                 const saltRounds = 10;
@@ -119,7 +119,7 @@ const authController = {
                 `;
                 await pool.query(insertLoginQuery, [loginID, newUser.rows[0].id]);
                 const token = jwt.sign({ userId: newUser.rows[0].id , loginId : loginID }, secretKey);
-                return res.json({ token, isNewUser: !user.rows[0].NewUserLandingCompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
+                return res.json({ token, isNewUser: !user.rows[0].newuserlandingcompleted, userID: newUser.rows[0].id, Name: newUser.rows[0].name, Email: newUser.rows[0].email });
             }
         } catch (error) {
             next(error);
