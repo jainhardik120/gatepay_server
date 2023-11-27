@@ -1,4 +1,3 @@
-const crypto = require("crypto")
 const pool = require('../database');
 const uuid = require("uuid");
 const pgFormat = require("pg-format");
@@ -121,8 +120,7 @@ const findShortestPathAndCalculateCost = async (sourceGateId, destinationGateId,
 
         graph[gateid2].push({ gateId2: gateid1, charges });
     });
-    const totalCost = await dijkstra(graph, sourceGateId, destinationGateId);
-    return totalCost;
+    return await dijkstra(graph, sourceGateId, destinationGateId);
 };
 
 
@@ -141,7 +139,7 @@ const parkingController = {
             const tollInfo = await getTollInfoByGateId(gateId);
             const parkTollId = tollInfo.parkingLotId;
             const type = tollInfo.type;
-            if (type == "Parking") {
+            if (type === "Parking") {
                 if (action === 'entry') {
                     const availableSpace = await pool.query('SELECT * FROM ParkingSpace WHERE ParkingLotID = $1 AND IsOccupied = FALSE LIMIT 1', [parkTollId]);
                     if (availableSpace.rows.length === 0) {
@@ -205,7 +203,7 @@ const parkingController = {
                     error.status = 400;
                     throw error;
                 }
-            } else if (type == "Toll") {
+            } else if (type === "Toll") {
                 if (action === 'entry') {
                     const entryTime = new Date();
                     const entryID = uuid.v4();
@@ -226,9 +224,7 @@ const parkingController = {
                     }
                     
                     const startNode = entryInfo.rows[0].entrygateid;
-                    const endNode = gateId;
-                    
-                    const totalCost = await findShortestPathAndCalculateCost(startNode, endNode, tollGateID);
+                    const totalCost = await findShortestPathAndCalculateCost(startNode, gateId, tollGateID);
                     
                     const transactionId = await chargeUser(vehicle.rows[0].userid, tollGateID, totalCost);
                     

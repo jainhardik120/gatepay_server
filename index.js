@@ -18,6 +18,7 @@ const parkingRouter = require("./routes/parking.routes.js")
 const employeeAuthRouter = require("./routes/employee.auth.routes.js");
 const vehicleRouter = require("./routes/vehicles.routes.js");
 const pointRouter = require("./routes/points.routes.js")
+const adjacencyRouter = require("./routes/toll.adjacency.routes")
 
 app.use('/api/auth', authRouter);
 app.use('/api/payments', paymentRouter);
@@ -25,6 +26,7 @@ app.use('/api/parking', parkingRouter);
 app.use('/api/employee/auth', employeeAuthRouter);
 app.use('/api/vehicle', vehicleRouter);
 app.use("/api/point", pointRouter);
+app.use("/api/toll/adjacency", adjacencyRouter)
 
 
 app.use((err, req, res, next) => {
