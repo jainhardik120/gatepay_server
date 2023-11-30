@@ -69,7 +69,7 @@ const pointsController = {
 
             const getPointsQuery = `
                 SELECT * FROM EntryExitPoints
-                WHERE ParkingLotID = $1;
+                WHERE ParkingTollID = $1;
             `;
 
             const result = await pool.query(getPointsQuery, [parkingId]);

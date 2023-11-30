@@ -4,6 +4,15 @@ const pool = require('../database');
 const uuid = require("uuid");
 const secretKey = process.env.SECRET_KEY;
 
+async function getUserType(parkingTollId) {
+    const parkingTypeQuery = 'SELECT Type FROM TollsAndParkingSpaces WHERE ID = $1';
+    const result = await pool.query(parkingTypeQuery, [parkingTollId]);
+    if (result.rows.length === 0) {
+      return null;
+    }
+    return result.rows[0].type;
+  }
+
 const authController = {
     login: async (req, res, next) => {
         try {
@@ -25,8 +34,16 @@ const authController = {
                 error.status = 401;
                 throw error;
             }
+            const parkingTollId = user.rows[0].parkingtollid;
+            const userType = await getUserType(parkingTollId);
+        
             const token = jwt.sign({ userId: user.rows[0].employeeid }, secretKey);
-            res.status(200).json({ token, userID: user.rows[0].employeeid});
+        
+            res.status(200).json({
+              token,
+              userId: user.rows[0].employeeid,
+              userType,
+            });
         } catch (error) {
             next(error);
         }
