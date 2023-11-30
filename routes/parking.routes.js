@@ -9,4 +9,6 @@ router.post('/createParkingSpaces', isAuth, parkingController.createParkingSpace
 
 router.get('/currentVehicleEntries', isAuth, parkingController.currentVehicleEntries)
 
+router.get('/pastVehicleHistory', isAuth, parkingController.pastVehicleHistory)
+
 module.exports = router;

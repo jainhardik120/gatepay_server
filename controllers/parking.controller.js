@@ -396,6 +396,79 @@ WHERE
         } catch (error) {
             next(error);
         }
+    },
+    pastVehicleHistory : async (req, res, next)=>{
+        try{
+            const userId = req.userId;
+            const tollGateEntriesQuery = `
+            SELECT
+                tge.EntryID,
+                tge.VehicleID,
+                tge.EntryTime AS EntryTimestamp,
+                tge.ExitTime AS ExitTimestamp,
+                tge.TransactionID,
+                v.VehicleNo,
+                v.Manufacturer,
+                v.Model,
+                v.Color,
+                eep.LocationCoordinates as EntryName,
+                eep2.LocationCoordinates as ExitName,
+                tsp.Name AS TollGateName,
+                ut.Amount
+            FROM
+                TollGateEntries tge
+            JOIN
+                Vehicle v ON tge.VehicleID = v.ID
+            JOIN
+                EntryExitPoints eep ON tge.EntryGateID = eep.PointID
+                JOIN
+                EntryExitPoints eep2 ON tge.ExitGateID = eep2.PointID
+            JOIN
+                TollsAndParkingSpaces tsp ON eep.ParkingTollID = tsp.ID
+            JOIN UserTransactions ut ON ut.TransactionID = tge.TransactionID
+            WHERE
+                v.UserID = $1
+                AND tge.ExitTime IS NOT NULL;
+          `;
+
+            const parkingEntriesQuery = `
+            SELECT
+    vee.EntryExitID,
+    vee.VehicleID,
+    vee.EntryTime AS EntryTimestamp,
+                vee.ExitTime AS ExitTimestamp,
+                vee.Charges,
+                vee.TransactionID,
+    vee.ParkingLotID,
+    vee.ParkingSpaceID,
+    v.VehicleNo,
+    v.Manufacturer,
+    v.Model,
+    v.Color,
+    tp.Name AS ParkingLotName
+FROM
+    VehicleEntryExit vee
+JOIN
+    Vehicle v ON vee.VehicleID = v.ID
+JOIN
+    TollsAndParkingSpaces tp ON vee.ParkingLotID = tp.ID
+WHERE
+    v.UserID = $1
+    AND vee.ExitTime IS NOT NULL;
+          `;
+
+            const tollGateEntriesResult = await pool.query(tollGateEntriesQuery, [userId]);
+            const parkingEntriesResult = await pool.query(parkingEntriesQuery, [userId]);
+
+            const combinedResults = {
+                tollGateEntries: tollGateEntriesResult.rows,
+                parkingEntries: parkingEntriesResult.rows,
+            };
+
+            return res.json(combinedResults)
+        }catch(error){
+            next(error)
+        }
     }
 }
 
