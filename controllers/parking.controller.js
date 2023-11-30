@@ -336,7 +336,7 @@ const parkingController = {
     },
     currentVehicleEntries: async (req, res, next) => {
         try {
-            const userId = '02eadd6f-3161-448f-a750-16629759b32c';
+            const userId = req.userId;
             const tollGateEntriesQuery = `
             SELECT
                 tge.EntryID,
