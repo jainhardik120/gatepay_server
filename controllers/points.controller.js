@@ -31,7 +31,11 @@ const pointsController = {
         `;
             const values = [pointID, parkingId, location, isActive];
             const result = await pool.query(createPointQuery, values);
-            res.status(201).json(result.rows[0]);
+            res.status(201).json({
+                location : result.rows[0].locationcoordinates,
+                isActive : result.rows[0].isactive,
+                pointId : result.rows[0].pointid
+            });
         } catch (error) {
             next(error);
         }
@@ -58,7 +62,11 @@ const pointsController = {
                 throw error;
             }
 
-            res.status(200).json(result.rows[0]);
+            res.status(200).json({
+                location : result.rows[0].locationcoordinates,
+                isActive : result.rows[0].isactive,
+                pointId : result.rows[0].pointid
+            });
         } catch (error) {
             next(error);
         }
@@ -73,7 +81,11 @@ const pointsController = {
             `;
 
             const result = await pool.query(getPointsQuery, [parkingId]);
-            res.status(200).json(result.rows);
+            res.status(200).json(result.rows.map(row => ({
+                location : row.locationcoordinates,
+                isActive : row.isactive,
+                pointId : row.pointid
+            })));
         } catch (error) {
             next(error);
         }

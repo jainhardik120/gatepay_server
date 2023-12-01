@@ -33,7 +33,12 @@ const adjacencyController = {
 
             const result = await pool.query(createTollGateAdjacencyQuery, values);
 
-            res.status(201).json(result.rows[0]);
+            res.status(201).json({
+                gateId1 : result.rows[0].gateid1,
+                gateId2 : result.rows[0].gateid2,
+                edgeId : result.rows[0].edgeid,
+                charges : result.rows[0].charges
+            });
         } catch (error) {
             next(error);
         }
@@ -44,7 +49,13 @@ const adjacencyController = {
             const tollGateId = await getParkingLotIdByEmployeeId(req.userId);
             const getAllTollGateAdjacenciesQuery = 'SELECT * FROM TollGateAdjacency WHERE TollGateID = $1;';
             const result = await pool.query(getAllTollGateAdjacenciesQuery, [tollGateId]);
-            res.status(200).json(result.rows);
+            res.status(200).json(result.rows.map(row=>({
+                gateId1 : row.gateid1,
+                gateId2 : row.gateid2,
+                edgeId : row.edgeid,
+                charges : row.charges
+
+            })));
         } catch (error) {
             next(error);
         }
@@ -61,7 +72,12 @@ const adjacencyController = {
             if (result.rows.length === 0) {
                 res.status(404).json({ message: 'Toll gate adjacency not found.' });
             } else {
-                res.status(200).json(result.rows[0]);
+                res.status(200).json({
+                    gateId1 : result.rows[0].gateid1,
+                    gateId2 : result.rows[0].gateid2,
+                    edgeId : result.rows[0].edgeid,
+                    charges : result.rows[0].charges
+                });
             }
         } catch (error) {
             next(error);
@@ -88,7 +104,12 @@ const adjacencyController = {
             if (result.rows.length === 0) {
                 res.status(404).json({ message: 'Toll gate adjacency not found.' });
             } else {
-                res.status(200).json(result.rows[0]);
+                res.status(200).json({
+                    gateId1 : result.rows[0].gateid1,
+                    gateId2 : result.rows[0].gateid2,
+                    edgeId : result.rows[0].edgeid,
+                    charges : result.rows[0].charges
+                });
             }
         } catch (error) {
             next(error);

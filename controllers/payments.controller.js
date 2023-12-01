@@ -3,6 +3,22 @@ const pool = require('../database');
 const instance = require("../razorpay")
 const uuid = require("uuid");
 
+
+async function getParkingLotIdByEmployeeId(employeeId) {
+    const query = `
+            SELECT ParkingTollID
+            FROM EmployeeAuthentication
+            WHERE EmployeeID = $1;
+        `;
+    const result = await pool.query(query, [employeeId]);
+    if (result.rows.length === 0) {
+        const error = new Error('Invalid employee id');
+        error.status = 404;
+        throw error;
+    }
+    return result.rows[0].parkingtollid;
+}
+
 const paymentsController = {
     checkBalance: async (req, res, next) => {
         try {
@@ -158,9 +174,71 @@ const paymentsController = {
     },
     spaceTransactions: async (req, res, next) => {
         try {
+            const tolParId = await getParkingLotIdByEmployeeId(req.userId);
+            const query = `
+                SELECT
+                    ut.TransactionID,
+                    ut.Date,
+                    ut.Amount
+                FROM UserTransactions ut
+                WHERE ut.TOLPARID = $1
+                ORDER BY ut.Date DESC;
+            `;
 
+            const { rows } = await pool.query(query, [tolParId]);
+
+            res.status(200).json(rows);
         } catch (error) {
-
+            next(error)
+        }
+    },
+    transactionDetails: async (req, res, next) => {
+        const tolParId = await getParkingLotIdByEmployeeId(req.userId);
+        const transactionId = req.params.TransactionID
+        const tollParkQueryResponse = await pool.query("SELECT * FROM TollsAndParkingSpaces WHERE ID = $1", [tolParId])
+        const type = tollParkQueryResponse.rows[0].type;
+        if (type == "Parking") {
+            const tollTransactionQuery = `
+    SELECT
+        vee.*,
+        v.VehicleNo,
+        v.Manufacturer,
+        v.Model,
+        v.Color
+    FROM
+    VehicleEntryExit vee
+    JOIN
+        Vehicle v ON vee.VehicleID = v.ID
+    WHERE
+        vee.TransactionID = $1;
+`;
+            const tollTransactionResult = await pool.query(tollTransactionQuery, [transactionId]);
+            res.json(tollTransactionResult.rows[0])
+        } else if (type == "Toll") {
+            const tollTransactionQuery = `
+    SELECT
+        tge.*,
+        v.VehicleNo,
+        v.Manufacturer,
+        v.Model,
+        v.Color,
+        egp_entry.LocationCoordinates AS EntryLocationCoordinates,
+        egp_exit.LocationCoordinates AS ExitLocationCoordinates
+    FROM
+        TollGateEntries tge
+    JOIN
+        Vehicle v ON tge.VehicleID = v.ID
+    JOIN
+        EntryExitPoints egp_entry ON tge.EntryGateID = egp_entry.PointID
+    JOIN
+        EntryExitPoints egp_exit ON tge.ExitGateID = egp_exit.PointID
+    WHERE
+        tge.TransactionID = $1;
+`;
+            const tollTransactionResult = await pool.query(tollTransactionQuery, [transactionId]);
+            res.json(tollTransactionResult.rows[0])
+        } else {
+            throw new Error("Invalid Type")
         }
     }
 }
